@@ -1,8 +1,5 @@
 from django.db import models
-<<<<<<< HEAD
 
-# Create your models here.
-=======
 from django.contrib.auth.models import AbstractUser
 
 class User(AbstractUser):
@@ -20,4 +17,3 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.username
->>>>>>> b49c53f (Initialized BACKEND)
