@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+=======
+
+>>>>>>> 7daeb1a (Day 2 frontend)
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
