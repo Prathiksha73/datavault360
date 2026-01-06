@@ -11,6 +11,10 @@ import os
 
 from django.core.wsgi import get_wsgi_application
 
+<<<<<<< HEAD
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "datavault.settings")
+=======
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'datavault.settings')
+>>>>>>> b49c53f (Initialized BACKEND)
 
 application = get_wsgi_application()
