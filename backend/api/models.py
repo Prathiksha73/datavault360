@@ -1,8 +1,13 @@
 from django.db import models
-
 from django.contrib.auth.models import AbstractUser
 
+
 class User(AbstractUser):
+    """
+    Custom User model extending Django's AbstractUser
+    to support role-based access (Admin, Doctor, Patient).
+    """
+
     ROLE_CHOICES = (
         ('ADMIN', 'Admin'),
         ('DOCTOR', 'Doctor'),
