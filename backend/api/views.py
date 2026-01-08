@@ -1,4 +1,3 @@
-from django.shortcuts import render
 from rest_framework import viewsets, permissions
 from rest_framework_simplejwt.views import TokenObtainPairView
 from .models import User, DoctorProfile, PatientProfile, Visit
@@ -10,92 +9,65 @@ from .serializers import (
 )
 
 
-# -------------------------------------------------
-# JWT LOGIN VIEW (DAY 1)
-# -------------------------------------------------
+# -------------------------
+# AUTH LOGIN VIEW
+# -------------------------
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
 
 
-# -------------------------------------------------
-# DOCTOR VIEWSET (DAY 2)
-# -------------------------------------------------
-class DoctorViewSet(viewsets.ModelViewSet):
+# -------------------------
+# DOCTOR VIEWSET
+# -------------------------
+class DoctorViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = DoctorProfile.objects.all()
     serializer_class = DoctorProfileSerializer
     permission_classes = [permissions.IsAuthenticated]
 
-    def get_queryset(self):
-        user = self.request.user
 
-        # Admin can see all doctors
-        if user.role == User.Role.ADMIN:
-            return DoctorProfile.objects.all()
-
-        # Doctor can see only his own profile
-        if user.role == User.Role.DOCTOR:
-            return DoctorProfile.objects.filter(user=user)
-
-        # Patient can see only assigned doctor
-        if user.role == User.Role.PATIENT:
-            return DoctorProfile.objects.filter(patients__user=user)
-
-        return DoctorProfile.objects.none()
-
-
-# -------------------------------------------------
-# PATIENT VIEWSET (DAY 3)
-# -------------------------------------------------
-class PatientViewSet(viewsets.ModelViewSet):
+# -------------------------
+# PATIENT VIEWSET
+# -------------------------
+class PatientViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = PatientProfileSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
         user = self.request.user
 
-        # Admin sees all patients
-        if user.role == User.Role.ADMIN:
-            return PatientProfile.objects.all()
-
-        # Doctor sees only his patients
-        if user.role == User.Role.DOCTOR:
-            return PatientProfile.objects.filter(doctor__user=user)
-
-        # Patient sees only his profile
-        if user.role == User.Role.PATIENT:
+        # Patient sees only their own profile
+        if user.role == 'PATIENT':
             return PatientProfile.objects.filter(user=user)
 
-        return PatientProfile.objects.none()
+        # Doctor sees only their patients
+        if user.role == 'DOCTOR':
+            return PatientProfile.objects.filter(doctor__user=user)
 
-    def perform_create(self, serializer):
-        # Doctor auto-assigns himself while creating patient
-        if self.request.user.role == User.Role.DOCTOR:
-            serializer.save(doctor=self.request.user.doctor_profile)
-        else:
-            serializer.save()
+        # Admin sees all
+        return PatientProfile.objects.all()
 
 
-# -------------------------------------------------
+# -------------------------
 # VISIT VIEWSET
-# -------------------------------------------------
-class VisitViewSet(viewsets.ModelViewSet):
+# -------------------------
+class VisitViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = VisitSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
         user = self.request.user
+        patient_id = self.request.query_params.get('patient')
 
-        # Doctor sees his visits
-        if user.role == User.Role.DOCTOR:
-            return Visit.objects.filter(doctor__user=user)
+        qs = Visit.objects.all()
 
-        # Patient sees his visits
-        if user.role == User.Role.PATIENT:
-            return Visit.objects.filter(patient__user=user)
+        # Filter by patient if query param present
+        if patient_id:
+            qs = qs.filter(patient_id=patient_id)
 
-        # Admin sees all
-        return Visit.objects.all()
+        if user.role == 'DOCTOR':
+            return qs.filter(doctor__user=user)
 
-    def perform_create(self, serializer):
-        # Doctor is auto-assigned during visit creation
-        if self.request.user.role == User.Role.DOCTOR:
-            serializer.save(doctor=self.request.user.doctor_profile)
+        if user.role == 'PATIENT':
+            return qs.filter(patient__user=user)
+
+        return qs
