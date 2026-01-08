@@ -6,16 +6,15 @@ from django.contrib.auth.models import AbstractUser
 # CUSTOM USER MODEL
 # -------------------------
 class User(AbstractUser):
-    ROLE_CHOICES = (
-        ('ADMIN', 'Admin'),
-        ('DOCTOR', 'Doctor'),
-        ('PATIENT', 'Patient'),
-    )
+    class Role(models.TextChoices):
+        ADMIN = "ADMIN", "Admin"
+        DOCTOR = "DOCTOR", "Doctor"
+        PATIENT = "PATIENT", "Patient"
 
     role = models.CharField(
         max_length=20,
-        choices=ROLE_CHOICES,
-        default='PATIENT'
+        choices=Role.choices,
+        default=Role.PATIENT
     )
 
     def __str__(self):
@@ -32,6 +31,7 @@ class DoctorProfile(models.Model):
         related_name='doctor_profile'
     )
     specialization = models.CharField(max_length=100)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"Doctor: {self.user.username}"
@@ -56,6 +56,7 @@ class PatientProfile(models.Model):
     date_of_birth = models.DateField(null=True, blank=True)
     phone_number = models.CharField(max_length=15)
     address = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"Patient: {self.user.username}"
