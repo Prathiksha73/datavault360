@@ -158,6 +158,32 @@ const DoctorDashboard = () => {
                 </div>
             )}
 
+            {/* Create Patient Modal */}
+            {showModal && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60]">
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="bg-white p-8 rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto"
+                    >
+                        <h2 className="text-2xl font-bold mb-6">Create New Patient</h2>
+                        <form onSubmit={handleCreatePatient} className="space-y-4">
+                            <div className="grid grid-cols-2 gap-4">
+                                <input type="text" placeholder="Username" value={formData.username} onChange={e => setFormData({ ...formData, username: e.target.value })} className="w-full p-3 border rounded-lg" required />
+                                <input type="password" placeholder="Password" value={formData.password} onChange={e => setFormData({ ...formData, password: e.target.value })} className="w-full p-3 border rounded-lg" required />
+                            </div>
+                            <input type="date" placeholder="Date of Birth" value={formData.date_of_birth} onChange={e => setFormData({ ...formData, date_of_birth: e.target.value })} className="w-full p-3 border rounded-lg" />
+                            <input type="text" placeholder="Phone Number" value={formData.phone_number} onChange={e => setFormData({ ...formData, phone_number: e.target.value })} className="w-full p-3 border rounded-lg" />
+                            <textarea placeholder="Address" value={formData.address} onChange={e => setFormData({ ...formData, address: e.target.value })} className="w-full p-3 border rounded-lg" rows="3"></textarea>
+
+                            <div className="flex space-x-3 mt-6">
+                                <button type="button" onClick={() => setShowModal(false)} className="flex-1 py-3 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200">Cancel</button>
+                                <button type="submit" className="flex-1 py-3 text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 shadow-md">Create Patient</button>
+                            </div>
+                        </form>
+                    </motion.div>
+                </div>
+            )}
         </Layout>
     );
 };
