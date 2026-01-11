@@ -23,7 +23,7 @@ class DoctorProfileSerializer(serializers.ModelSerializer):
         if 'password' in validated_data:
             user_data['password'] = validated_data.pop('password')
         
-        # Create user
+
         user = User.objects.create_user(role=User.Role.DOCTOR, **user_data)
         
         doctor = DoctorProfile.objects.create(user=user, **validated_data)
@@ -35,7 +35,7 @@ class RoomSerializer(serializers.ModelSerializer):
     class Meta:
         model = Room
         fields = ['id', 'room_number', 'room_type', 'speciality', 'patient', 'scheduled_discharge', 'patient_details']
-        read_only_fields = ['patient'] # Patient assignment handled via actions
+        read_only_fields = ['patient']
 
     def get_patient_details(self, obj):
         if obj.patient:
@@ -59,7 +59,7 @@ class PatientProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = PatientProfile
-        fields = ['id', 'user', 'doctors', 'doctor_ids', 'assigned_room', 'date_of_birth', 'phone_number', 'address', 'password', 'username']
+        fields = ['id', 'user', 'doctors', 'doctor_ids', 'assigned_room', 'date_of_birth', 'phone_number', 'address_line', 'city', 'state', 'postal_code', 'country', 'gender', 'active', 'full_address', 'password', 'username']
         read_only_fields = ['doctors', 'assigned_room']
 
     def create(self, validated_data):
@@ -85,7 +85,7 @@ class PatientProfileSerializer(serializers.ModelSerializer):
             doctor_ids = validated_data.pop('doctor_ids')
             instance.doctors.set(doctor_ids)
         
-        # Allow updating other fields
+
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         
@@ -157,5 +157,14 @@ class InvitationCompleteSerializer(serializers.Serializer):
     first_name = serializers.CharField()
     last_name = serializers.CharField()
     password = serializers.CharField()
-    # Optional: confirm password handled in frontend or separate validator
+    
+    # Patient Specific Fields (Optional here, validated in view based on role)
+    gender = serializers.CharField(required=False)
+    date_of_birth = serializers.DateField(required=False)
+    phone_number = serializers.CharField(required=False)
+    address_line = serializers.CharField(required=False)
+    city = serializers.CharField(required=False)
+    state = serializers.CharField(required=False)
+    postal_code = serializers.CharField(required=False)
+    country = serializers.CharField(required=False)
 

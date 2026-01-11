@@ -57,7 +57,16 @@ const SetupAccount = () => {
                 username: formData.username,
                 password: formData.password,
                 first_name: formData.firstName,
-                last_name: formData.lastName
+                last_name: formData.lastName,
+                // Optional Patient fields
+                gender: formData.gender,
+                date_of_birth: formData.date_of_birth,
+                phone_number: formData.phone_number,
+                address_line: formData.address_line,
+                city: formData.city,
+                state: formData.state,
+                postal_code: formData.postal_code,
+                country: formData.country,
             });
             toast.success('Account setup complete! Please login.');
             navigate('/login');
@@ -141,6 +150,113 @@ const SetupAccount = () => {
                             />
                         </div>
                     </div>
+
+                    {inviteData.role === 'PATIENT' && (
+                        <>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">Date of Birth</label>
+                                    <input
+                                        type="date"
+                                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+                                        value={formData.date_of_birth || ''}
+                                        onChange={(e) => setFormData({ ...formData, date_of_birth: e.target.value })}
+                                        required
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">Gender</label>
+                                    <select
+                                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+                                        value={formData.gender || ''}
+                                        onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
+                                        required
+                                    >
+                                        <option value="">Select Gender</option>
+                                        <option value="male">Male</option>
+                                        <option value="female">Female</option>
+                                        <option value="other">Other</option>
+                                        <option value="unknown">Unknown</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
+                                <input
+                                    type="tel"
+                                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+                                    placeholder="+91-0000000000"
+                                    value={formData.phone_number || ''}
+                                    onChange={(e) => setFormData({ ...formData, phone_number: e.target.value })}
+                                    required
+                                />
+                            </div>
+
+                            <div className="space-y-4 border-t pt-4 mt-4">
+                                <h3 className="text-sm font-bold text-gray-600 uppercase">Address Details</h3>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">Address Line</label>
+                                    <input
+                                        type="text"
+                                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+                                        placeholder="Flat, Street, Area"
+                                        value={formData.address_line || ''}
+                                        onChange={(e) => setFormData({ ...formData, address_line: e.target.value })}
+                                        required
+                                    />
+                                </div>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">City</label>
+                                        <input
+                                            type="text"
+                                            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+                                            placeholder="City"
+                                            value={formData.city || ''}
+                                            onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                                            required
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">State</label>
+                                        <input
+                                            type="text"
+                                            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+                                            placeholder="State"
+                                            value={formData.state || ''}
+                                            onChange={(e) => setFormData({ ...formData, state: e.target.value })}
+                                            required
+                                        />
+                                    </div>
+                                </div>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">Postal Code</label>
+                                        <input
+                                            type="text"
+                                            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+                                            placeholder="ZIP Code"
+                                            value={formData.postal_code || ''}
+                                            onChange={(e) => setFormData({ ...formData, postal_code: e.target.value })}
+                                            required
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">Country</label>
+                                        <input
+                                            type="text"
+                                            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+                                            placeholder="Country"
+                                            value={formData.country || ''}
+                                            onChange={(e) => setFormData({ ...formData, country: e.target.value })}
+                                            required
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </>
+                    )}
 
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">Set Password</label>

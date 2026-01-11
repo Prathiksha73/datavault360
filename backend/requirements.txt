@@ -8,6 +8,7 @@ Django==6.0
 django-cors-headers==4.9.0
 djangorestframework==3.16.1
 djangorestframework_simplejwt==5.5.1
+dnspython==2.8.0
 fonttools==4.61.1
 idna==3.11
 Markdown==3.10
@@ -15,6 +16,7 @@ pillow==12.1.0
 pycparser==2.23
 pydyf==0.12.1
 PyJWT==2.10.1
+pymongo==4.16.0
 pyphen==0.17.2
 python-decouple==3.8
 requests==2.32.5

@@ -8,6 +8,24 @@ import {
 
 const COLORS = ['#00C49F', '#FFBB28', '#FF8042', '#0088FE'];
 
+
+const CustomXAxisTick = ({ x, y, payload }) => {
+    if (!payload || !payload.value) return null;
+
+    const [yearStr, monthStr] = payload.value.split('-');
+    const date = new Date(parseInt(yearStr), parseInt(monthStr) - 1);
+    const monthName = date.toLocaleString('default', { month: 'short' });
+
+    return (
+        <g transform={`translate(${x},${y})`}>
+            <text x={0} y={0} dy={16} textAnchor="middle" fill="#666" fontSize={12}>
+                <tspan x={0} dy="0.5em" fontWeight="600" fill="#374151">{monthName}</tspan>
+                <tspan x={0} dy="1.2em" fontSize={10} fill="#9CA3AF">{yearStr}</tspan>
+            </text>
+        </g>
+    );
+};
+
 const InsightsTab = () => {
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -31,7 +49,7 @@ const InsightsTab = () => {
 
     const { counts, financials, inventory } = data;
 
-    // Room Pie Data
+
     const roomPieData = [
         { name: 'Active (Available)', value: counts.rooms_available },
         { name: 'Occupied', value: counts.rooms_occupied },
@@ -40,7 +58,7 @@ const InsightsTab = () => {
 
     return (
         <div className="space-y-8 animate-fade-in-up">
-            {/* Stats Grid */}
+
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <StatCard
                     icon={<FiUsers />}
@@ -69,27 +87,40 @@ const InsightsTab = () => {
                 />
             </div>
 
-            {/* Charts Section */}
+
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                {/* Financials */}
+
                 <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
                     <h3 className="text-lg font-bold text-gray-800 mb-6">Financial Overview (Last 6 Months)</h3>
                     <div className="h-80">
                         <ResponsiveContainer width="100%" height="100%">
-                            <BarChart data={financials}>
+                            <BarChart data={financials} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
                                 <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                                <XAxis dataKey="name" />
-                                <YAxis />
-                                <Tooltip />
-                                <Legend />
-                                <Bar dataKey="Income" fill="#10B981" radius={[4, 4, 0, 0]} />
-                                <Bar dataKey="Expense" fill="#EF4444" radius={[4, 4, 0, 0]} />
+                                <XAxis
+                                    dataKey="name"
+                                    tick={<CustomXAxisTick />}
+                                    interval={0}
+                                    tickLine={false}
+                                    axisLine={{ stroke: '#E5E7EB' }}
+                                />
+                                <YAxis
+                                    axisLine={false}
+                                    tickLine={false}
+                                    tick={{ fill: '#9CA3AF', fontSize: 12 }}
+                                />
+                                <Tooltip
+                                    contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}
+                                    cursor={{ fill: 'rgba(243, 244, 246, 0.5)' }}
+                                />
+                                <Legend wrapperStyle={{ paddingTop: '20px' }} />
+                                <Bar dataKey="Income" fill="#10B981" radius={[4, 4, 0, 0]} barSize={20} />
+                                <Bar dataKey="Expense" fill="#EF4444" radius={[4, 4, 0, 0]} barSize={20} />
                             </BarChart>
                         </ResponsiveContainer>
                     </div>
                 </div>
 
-                {/* Room Stats */}
+
                 <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
                     <h3 className="text-lg font-bold text-gray-800 mb-6">Room Occupancy & Status</h3>
                     <div className="h-80 flex items-center justify-center">
@@ -117,7 +148,7 @@ const InsightsTab = () => {
                 </div>
             </div>
 
-            {/* Inventory Table */}
+
             <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
                 <div className="flex justify-between items-center mb-6">
                     <h3 className="text-lg font-bold text-gray-800">Inventory Management</h3>

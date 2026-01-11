@@ -50,14 +50,19 @@ class Command(BaseCommand):
             username = f"{fullname.lower().replace(' ', '_')}_{i}"
             user = User.objects.create_user(username=username, email=f"{username}@example.com", password='pat', role=User.Role.PATIENT, first_name=fullname.split()[0], last_name=fullname.split()[1])
             
-            # Randomly assign 1-3 doctors
+
             assigned_doctors = random.sample(doctors, k=random.randint(1, 3))
             
             patient = PatientProfile.objects.create(
                 user=user, 
                 date_of_birth=f"{random.randint(1960, 2010)}-{random.randint(1, 12):02d}-{random.randint(1, 28):02d}",
                 phone_number=f"+91{random.randint(7000000000, 9999999999)}",
-                address=f"Flat {random.randint(100, 999)}, Tower {random.choice(['A', 'B', 'C'])}, Mumbai"
+                address_line=f"Flat {random.randint(100, 999)}, Tower {random.choice(['A', 'B', 'C'])}",
+                city="Mumbai",
+                state="Maharashtra",
+                postal_code="400001",
+                country="India",
+                gender=random.choice(['male', 'female'])
             )
             patient.doctors.set(assigned_doctors)
             

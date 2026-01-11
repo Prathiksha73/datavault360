@@ -180,33 +180,119 @@ class InvitationViewSet(viewsets.ViewSet):
             first_name = serializer.validated_data['first_name']
             last_name = serializer.validated_data['last_name']
             
-            # Create User
+
             if User.objects.filter(username=username).exists():
                 return Response({'error': 'Username already taken'}, status=status.HTTP_400_BAD_REQUEST)
                 
             user = User.objects.create_user(username=username, password=password, email=invitation.email, role=invitation.role, first_name=first_name, last_name=last_name)
             
-            # Create Profile based on Role
+
             if invitation.role == User.Role.DOCTOR:
                 specialization = invitation.extra_data.get('specialization', '')
                 DoctorProfile.objects.create(user=user, specialization=specialization)
             elif invitation.role == User.Role.PATIENT:
-                # Handle extra patient data
+
                 doctor_id = invitation.extra_data.get('doctor_id')
-                dob = invitation.extra_data.get('date_of_birth')
-                phone = invitation.extra_data.get('phone_number')
-                address = invitation.extra_data.get('address')
                 
-                patient = PatientProfile.objects.create(
+
+                gender = serializer.validated_data.get('gender', 'unknown')
+                dob = serializer.validated_data.get('date_of_birth')
+                phone = serializer.validated_data.get('phone_number', '')
+                
+                address_line = serializer.validated_data.get('address_line', '')
+                city = serializer.validated_data.get('city', '')
+                state = serializer.validated_data.get('state', '')
+                postal_code = serializer.validated_data.get('postal_code', '')
+                country = serializer.validated_data.get('country', '')
+                
+                patient_profile = PatientProfile.objects.create(
                     user=user,
                     date_of_birth=dob,
+                    gender=gender,
                     phone_number=phone,
-                    address=address
+                    address_line=address_line,
+                    city=city,
+                    state=state,
+                    postal_code=postal_code,
+                    country=country
                 )
+                
                 if doctor_id:
-                    patient.doctors.add(doctor_id)
+
+                    if DoctorProfile.objects.filter(id=doctor_id).exists():
+                        patient_profile.doctors.add(doctor_id)
+                    else:
+                        print(f"Warning: Doctor with ID {doctor_id} not found. Skipping assignment.")
+
+
+                try:
+                    import pymongo
+                    from datetime import datetime
+                    
+                    pat_id = f"pat-{patient_profile.user.id}"
+                    
+                    fhir_patient = {
+                        "resourceType": "Patient",
+                        "id": pat_id,
+                        "active": True,
+                        "identifier": [
+                            {
+                                "use": "usual",
+                                "system": "https://yourdomain.com/patient-id",
+                                "value": pat_id
+                            }
+                        ],
+                        "name": [
+                            {
+                                "use": "official",
+                                "family": last_name,
+                                "given": [first_name]
+                            }
+                        ],
+                        "gender": gender,
+                        "birthDate": dob.isoformat() if dob else None,
+                        "telecom": [
+                            {
+                                "system": "phone",
+                                "value": phone,
+                                "use": "mobile"
+                            },
+                            {
+                                "system": "email",
+                                "value": invitation.email,
+                                "use": "home"
+                            }
+                        ],
+                        "address": [
+                            {
+                                "use": "home",
+                                "type": "both",
+                                "line": [address_line],
+                                "city": city,
+                                "state": state,
+                                "postalCode": postal_code,
+                                "country": country
+                            }
+                        ]
+                    }
+                    
+                    import os
+
+                    mongo_host = os.getenv('MONGO_HOST', 'localhost')
+                    mongo_port = int(os.getenv('MONGO_PORT', 27017))
+                    client = pymongo.MongoClient(f"mongodb://{mongo_host}:{mongo_port}/")
+                    db = client["fhir_db"]
+                    collection = db["fhir_patient"]
+                    
+
+                    collection.insert_one(fhir_patient)
+                    print(f"FHIR Patient {pat_id} inserted into MongoDB.")
+                    
+                except Exception as e:
+                    print(f"MongoDB Insert FAILED: {e}")
+                    # Do not block success (SQLite is primary)
             
-            # Mark invitation as used
+
             invitation.status = 'USED'
             invitation.save()
             

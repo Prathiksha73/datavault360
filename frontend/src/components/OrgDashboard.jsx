@@ -482,7 +482,7 @@ const OrgDashboard = () => {
                                     <input type="email" placeholder="Email Address" value={patientForm.email} onChange={e => setPatientForm({ ...patientForm, email: e.target.value })} className="w-full p-3 border rounded-lg" required />
                                     <input type="date" placeholder="Date of Birth" value={patientForm.date_of_birth} onChange={e => setPatientForm({ ...patientForm, date_of_birth: e.target.value })} className="w-full p-3 border rounded-lg" />
                                     <input type="text" placeholder="Phone Number" value={patientForm.phone_number} onChange={e => setPatientForm({ ...patientForm, phone_number: e.target.value })} className="w-full p-3 border rounded-lg" />
-                                    <textarea placeholder="Address" value={patientForm.address} onChange={e => setPatientForm({ ...patientForm, address: e.target.value })} className="w-full p-3 border rounded-lg" rows="2"></textarea>
+
 
                                     <select
                                         value={patientForm.doctor_id}
